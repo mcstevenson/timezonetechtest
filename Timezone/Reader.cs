@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Serilog;
+
 using Timezone.Properties;
 
 namespace Timezone
@@ -18,11 +18,13 @@ namespace Timezone
 
             if (resource == null)
             {
+                Log.Error("Unable to access Timezone.txt");
                 throw new NullReferenceException("The resource file Timezone.txt has been removed or is unavailable.");
             }
 
             if (string.IsNullOrWhiteSpace(resource.ToString()))
             {
+                Log.Error("The resource file Timezone.txt is empty.");
                 throw new Exception("The resource file Timezone.txt is empty. Please close the application and update the file.");
             }
 
@@ -40,6 +42,7 @@ namespace Timezone
                 if (!success)
                 {
                     // log the error and move to the next line
+                    Log.Debug($"Unable to parse the time for {sLineParts[1]}");
                     continue;
                 }
 

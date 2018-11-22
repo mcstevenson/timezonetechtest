@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Serilog;
 
 namespace Timezone
 {
@@ -11,6 +9,12 @@ namespace Timezone
     {        
         static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File("logs\\Timezone.log", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
             Parser timeZoneParser = new Parser();
             using (Reader fileReader = new Reader())
             {
