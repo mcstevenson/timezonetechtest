@@ -8,5 +8,9 @@ namespace Timezone
 {
     class Parser : IParser
     {
+        public void DisplayTime(string time, string timezone)
+        {
+
+        }
     }
 }
