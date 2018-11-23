@@ -21,7 +21,7 @@
         /// <returns>Returns a list of <see cref="TimezoneConverter"/></returns>
         public List<TimezoneConverter> Read()
         {
-            List<TimezoneConverter> lReturn = new List<TimezoneConverter>();
+            List<TimezoneConverter> timeZones = new List<TimezoneConverter>();
 
             var resource = Resources.ResourceManager.GetObject("Timezone");
 
@@ -44,33 +44,33 @@
             {
                 foreach (string part in fileParts)
                 {
-                    string[] sLineParts = part.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] elements = part.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                     // validate the time element
                     TimeSpan tSpan;
-                    var success = TimeSpan.TryParse(sLineParts[0], out tSpan);
+                    var success = TimeSpan.TryParse(elements[0], out tSpan);
 
                     if (!success)
                     {
-                        Log.Error($"Unable to parse the time for timezone: {sLineParts[1]}");
+                        Log.Error($"Unable to parse the time for timezone: {elements[1]}");
                         continue;
                     }
 
                     // validate the timezone element
-                    var destZone = TimeZoneInfo.GetSystemTimeZones().SingleOrDefault(z => z.DisplayName.Contains(sLineParts[1]));
+                    var destZone = TimeZoneInfo.GetSystemTimeZones().SingleOrDefault(z => z.DisplayName.Contains(elements[1]));
 
                     if (destZone == null)
                     {
-                        Log.Error($"The registry does not define a timezone that contains {sLineParts[1]}.");
+                        Log.Error($"The registry does not define a timezone that contains {elements[1]}.");
                         continue;
                     }
 
-                    var timeZoneConverter = new TimezoneConverter(sLineParts[0], sLineParts[1]);
-                    lReturn.Add(new TimezoneConverter(sLineParts[0], sLineParts[1]));
+                    var timeZoneConverter = new TimezoneConverter(elements[0], elements[1]);
+                    timeZones.Add(new TimezoneConverter(elements[0], elements[1]));
                 } 
             }
 
-            return lReturn;
+            return timeZones;
         }
 
         /// <summary>
