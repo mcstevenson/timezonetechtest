@@ -1,61 +1,81 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Serilog;
-
-using Timezone.Properties;
-
-namespace Timezone
+﻿namespace Timezone
 {
-    class Reader : IReader, IDisposable
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Serilog;
+
+    using Timezone.Properties;
+
+    /// <summary>
+    /// The Reader class. Used to read the data from the source file.
+    /// </summary>
+    /// <seealso cref="Timezone.IReader" />
+    /// <seealso cref="System.IDisposable" />
+    public class Reader : IReader, IDisposable
     {
-        public List<Tuple<string, string>> Read()
+        /// <summary>
+        /// Reads the data from the source file
+        /// </summary>
+        /// <returns>Returns a list of <see cref="TimezoneConverter"/></returns>
+        public List<TimezoneConverter> Read()
         {
-            List<Tuple<string, string>> lReturn = new List<Tuple<string, string>>();
+            List<TimezoneConverter> lReturn = new List<TimezoneConverter>();
 
             var resource = Resources.ResourceManager.GetObject("Timezone");
 
             if (resource == null)
             {
+                // the resource file could not be found 
                 Log.Error("Unable to access Timezone.txt");
-                throw new NullReferenceException("The resource file Timezone.txt has been removed or is unavailable.");
             }
 
             if (string.IsNullOrWhiteSpace(resource.ToString()))
             {
+                // the resource file is empty
                 Log.Error("The resource file Timezone.txt is empty.");
-                throw new Exception("The resource file Timezone.txt is empty. Please close the application and update the file.");
             }
 
-            string[] fileParts = Resources.Timezone.Split( new[] { "\r\n", "\r", "\n" },  StringSplitOptions.RemoveEmptyEntries); 
-            
+            string[] fileParts = Resources.Timezone.Split( new[] { "\r\n", "\r", "\n" },  StringSplitOptions.RemoveEmptyEntries);
 
-            foreach (string part in fileParts)
-            {               
-                string[] sLineParts = part.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                TimeSpan timespan;
-
-                var success = TimeSpan.TryParse(sLineParts[1], out timespan);
-
-                if (!success)
+            if (fileParts.Length > 1)
+            {
+                foreach (string part in fileParts)
                 {
-                    // log the error and move to the next line
-                    Log.Debug($"Unable to parse the time for {sLineParts[1]}");
-                    continue;
-                }
+                    string[] sLineParts = part.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                var tZone = TimeZoneInfo.GetSystemTimeZones().Where(t => t.DisplayName.Contains(sLineParts[1]));
+                    // validate the time element
+                    TimeSpan tSpan;
+                    var success = TimeSpan.TryParse(sLineParts[0], out tSpan);
 
+                    if (!success)
+                    {
+                        Log.Error($"Unable to parse the time for timezone: {sLineParts[1]}");
+                        continue;
+                    }
 
-                Tuple<string, string> timeZone = new Tuple<string, string>(sLineParts.First(), sLineParts.Last());
+                    // validate the timezone element
+                    var destZone = TimeZoneInfo.GetSystemTimeZones().SingleOrDefault(z => z.DisplayName.Contains(sLineParts[1]));
 
-                lReturn.Add(timeZone);
+                    if (destZone == null)
+                    {
+                        Log.Error($"The registry does not define a timezone that contains {sLineParts[1]}.");
+                        continue;
+                    }
+
+                    var timeZoneConverter = new TimezoneConverter(sLineParts[0], sLineParts[1]);
+                    lReturn.Add(new TimezoneConverter(sLineParts[0], sLineParts[1]));
+                } 
             }
 
             return lReturn;
         }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
         }

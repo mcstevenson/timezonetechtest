@@ -1,12 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Serilog;
-
-namespace Timezone
+﻿namespace Timezone
 {
-    class Program
-    {        
+    using System.Collections.Generic;
+
+    using Serilog;
+
+    /// <summary>
+    /// Timezone application. Used to display converted timezone information.
+    /// </summary>
+    public class Program
+    {
+        /// <summary>
+        /// Defines the entry point of the application.
+        /// </summary>
+        /// <param name="args">The arguments.</param>
         static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
@@ -15,13 +21,15 @@ namespace Timezone
                 .WriteTo.File("logs\\Timezone.log", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 
+            Log.Information("Application started");
+
             Parser timeZoneParser = new Parser();
             using (Reader fileReader = new Reader())
             {
-                List<Tuple<string, string>> lTimes = fileReader.Read();
+                List<TimezoneConverter> lTimes = fileReader.Read();
                 foreach (var time in lTimes)
                 {
-                    timeZoneParser.DisplayTime(time.Item1, time.Item2);
+                    timeZoneParser.DisplayTime(time);
                 }
             }
         }

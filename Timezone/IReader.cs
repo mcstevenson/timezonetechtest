@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Timezone
+﻿namespace Timezone
 {
-    interface IReader
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Reads from the source file.
+    /// </summary>
+    public interface IReader
     {
-        List<Tuple<string, string>> Read();
+        /// <summary>
+        /// Reads from the source file.
+        /// </summary>
+        /// <returns>Returns <see cref="List{TimezoneConverter}<"/></returns>
+        List<TimezoneConverter> Read();
     }
 }

@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Timezone
+﻿namespace Timezone
 {
-    interface IParser
+    /// <summary>
+    /// Parses the data and displays as a string
+    /// </summary>
+    public interface IParser
     {
-        void DisplayTime(string time, string timezone);
+        /// <summary>
+        /// Displays the time string.
+        /// </summary>
+        /// <param name="zone">The zone.</param>
+        void DisplayTime(TimezoneConverter zone);
     }
 }

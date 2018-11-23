@@ -62,6 +62,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Reader.cs" />
+    <Compile Include="TimezoneConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
